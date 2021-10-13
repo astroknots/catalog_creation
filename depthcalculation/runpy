@@ -1,0 +1,7 @@
+#!/bin/bash
+for item in $(cat emptyApertureAnalysis_share/aperflux/all_irc_aps.txt); do
+echo $item
+python depthcalc_v2.py $item >> output_irc0218_f160w_v1.txt
+
+
+done

@@ -1,0 +1,30 @@
+Empty Aperture Analysis
+Updated 3/14/2020
+Tufts University
+Daniel Lange-Vagle
+
+--------------------------------------------------------------------------------
+
+These scripts are developed to be run on noise normalized, and object subtracted images.
+
+Noise Normalization
+noise_normalized_image = science_image * sqrt(inverse_variance_image)
+
+Object Subtraction, mask all detected sources using the segmentation map.
+noise_normalized_image[segmentation_map != 0] = 0
+
+Also, make sure that pixels without data are set to 0.
+
+--------------------------------------------------------------------------------
+
+Once the image is ready for empty aperture analysis, execute the emptyApertureAnalysis.run() function to conduct the analysis and produce figures.
+
+sigmas, alpha, beta = run(imname='image_name.fits', outfile='outfile_name', pixscl=0.06, ref_aper=0.7, naper=1000, figures=True, title='figure title', nbins=35, readfromfile=False)
+
+run() will output files for each aperture, located in the aperflux/ directory, which contain the x, y coordinates of the empty apertures and the flux measurements within each aperture. run() returns a list of each aperture flux sigmas and the power-law fit parameters, alpha and beta. If figures is set to True, it creates the two plots in Figure 9 from Shipley et al. 2018.
+
+--------------------------------------------------------------------------------
+
+Please refer to the Jupyter notebook to see an example run of the empty aperture analysis code.
+
+--------------------------------------------------------------------------------

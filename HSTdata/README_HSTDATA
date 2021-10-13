@@ -1,0 +1,3 @@
+download your archival images here; one directory per cluster is best
+cropbigfile.py is useful if one your images is a mosaic and crashes your computer when you work with it
+maskitextra.py makes a proper mask image and a noise-normalized version of the data image

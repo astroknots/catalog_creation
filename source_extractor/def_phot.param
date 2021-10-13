@@ -1,0 +1,26 @@
+NUMBER	#running obj number
+X_IMAGE
+Y_IMAGE
+ALPHA_J2000			#ra of detection
+DELTA_J2000 			#dec of detection
+FLAGS                    	# Extraction flags
+CLASS_STAR              	# 1 is star, 0 is galaxy                [none]
+#MAG_ISO
+#MAGERR_ISO
+#MAG_AUTO
+#MAGERR_AUTO
+#MAG_APER
+#MAGERR_APER
+FLUX_AUTO			#Flux auto
+FLUXERR_AUTO			#Flux auto error
+FLUX_ISO			#Flux iso
+FLUXERR_ISO			#flux iso error
+FLUX_APER			#flux aper
+FLUXERR_APER			#flux aper error
+FWHM_IMAGE			#fwhm image
+KRON_RADIUS			# kron radius
+ISOAREA_IMAGE			#isoarea image
+A_IMAGE				#A_image
+B_IMAGE				#B_image
+THETA_IMAGE			#Theta_image
+#note these last ones are for isophots
