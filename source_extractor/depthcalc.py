@@ -68,7 +68,7 @@ def fithists(totfile,binnum):
     return holdhist,outname
 
 #############calculate RMS for Labbeplot
-def rmscalc(fits_sci,fits_mask,fits_seg,apertures,pixscale=0.1):
+def rmscalc(fits_sci,fits_mask,fits_seg,apertures=[0,1],pixscale=0.1):
 
 ####Labbe03 plot setup
 #take full image (hdusci) and select only those pixels that are:
