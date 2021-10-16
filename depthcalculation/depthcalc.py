@@ -20,6 +20,7 @@ from IPython.display import IFrame
 def depth(totfile,photvals):
     valsin=np.loadtxt(totfile,dtype=float,delimiter='\t',usecols=2,comments='#')
     #########calculate average flux and stdev
+    ##note that according to the README in emptyApertureAnalysis, the sigmas returned by runEAA.py should already be Fluxes (as opposed to counts?)
     stdev_empty=np.std(valsin)
     avg_emptyflux=np.average(valsin)
 
