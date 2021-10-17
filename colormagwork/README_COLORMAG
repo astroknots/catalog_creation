@@ -1,0 +1,2 @@
+Note that you will  need gogreen_photometry.fits to compare the sky coordinates of sources identified with Source Extractor (our catalog)
+and the coordinates of the associated GoGreen sources. Contact Greg Rudnick (grudnick@ku.edu) for info on how to access this file

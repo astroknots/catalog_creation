@@ -1,33 +1,35 @@
-## Meta-table for Catalog Creation containing properties of the 5 relevant HST archival cluster data																						
-# A: the astronomical name of the cluster																						
-#B: the corresponding database ID of each cluster found in the GOGREEN database by G. Brammer																						
-#C: RA in degrees																						
-#D: Dec in Degrees																						
-#E: Expected redshift 																						
-#F-J are integration times for the specific clusters; the observation time varies across the *sci.fits image due to multiple pointings and drizzling.																						
-#F: HST observation time with the F606w filter (seconds)																						
-#G: HST observation time with the F814w or F814wu filter (seconds)																						
-#H: HST observation time with the F105w filter (seconds)																						
-#I: HST observation time with the F140w filter (seconds)																						
-#J: HST observation time with the F160w filter (seconds)																						
-#K-O are values of the 5-sigma depth of each band, in an aperture with a diameter= 0.5 arcsec. These are derived through empty aperture simulation and the use of the Working_Depth.ipynb. (AB magnitudes)																						
-#K: the 5-sigma AB magnitude depth in a 0.5 arcsecond diameter aperture for the F606w band image																						
-#L: the 5-sigma AB magnitude depth in a 0.5 arcsecond diameter aperture for the F814w band image																						
-#M: the 5-sigma AB magnitude depth in a 0.5 arcsecond diameter aperture for the F105w band image																						
-#N: the 5-sigma AB magnitude depth in a 0.5 arcsecond diameter aperture for the F140w band image																						
-#O: the 5-sigma AB magnitude depth in a 0.5 arcsecond diameter aperture for the F160w band image																						
-## the rest of the table is divided into properties for a 'blueward' and 'redward' band, referring to the image bands with the deepest integration time that fall on either side of the 4000 Angstrom break of the cluster, given the cluster's expected redshift. P and T identify which bands were used to derive the RMS properties and linear size-noise dispersion relation coefficients for the 'blueward' and 'redward' bands respectively. Therefore Q,R, and S are properties derived from the band identified in P, and U,V, and W are properties derived from the band identified in T 																						
-##R and S, and also V and W, are the 2nd and 3rd coefficients of a polynomial fit to the noise of the blueward and redward bands as a function of linear size: f(x) = c1+c2*x + c3*x^2. the value of c1 is set to zero for both bands. c2 and c3 can be related to a_i and b_i from Labbe+03's eqn 3 using the rms of the image and the weight associated with each source. They are derived, in Working_Depth.ipynb, from the results of an empty aperture simulation that places 1000 apertures of a given size across a noise-normalized, object-subtracted, masked version of the native image. 																						
-#P: Identifier for the deepest band blueward of the 4000 Angstrom break																						
-#Q: full RMS background measurement returned by depthcalc.rmscalc(). Current number looks at the native science image (clusterid-filterblue_drz_sci.fits), but might be more appropriate to do this to the noisenormalized science image (clusterid-filter_drz_sci_newnorm3.fits)																						
-#R: second coefficient  for a 2nd order polynomial fit to the standard deviation of the flux as a function of linear size (square root of the area of the associated aperture). blue band image 																						
-#S: third coefficient  for a 2nd order polynomial fit to the standard deviation of the flux as a function of linear size (square root of the area of the associated aperture). blue band image																						
-#T: Identifier for the deepest band redward of the 4000 Angstrom break																						
-#U: full RMS background measurement returned by depthcalc.rmscalc(). Current number looks at the native science image (clusterid-filter_drz_sci.fits), but might be more appropriate to do this to the noisenormalized science image (clusterid-filterred_drz_sci_newnorm3.fits)																						
-#V: second coefficient  for a 2nd order polynomial fit to the standard deviation of the flux as a function of linear size (square root of the area of the associated aperture). red band image																						
-#W: third coefficient  for a 2nd order polynomial fit to the standard deviation of the flux as a function of linear size (square root of the area of the associated aperture). red band image																						
-IDCS1426.5+3508	j142632p3508	216.625	35.133333	1.75	21760	12620	15242.6368	16292.0243	9053.538417	28.5	27.9	27.9	28.1	27.3	F606w	0.00256719	0.005538353534	0.0001737992981	F140w	0.020567134	0.01562541459	0.001310705061
-SpARCS J1049	j104924p5641	162.344167	56.675694	1.7089	0	2846	8525.721866	0	9213.998767	0	26.2	27.5	0	27.3	F105w	0.035111424	0.01793439735	0.003119223968	F160w	0.031919356	0.02005814456	0.001921471231
-USS 1558-003	j160116m0029	240.322303	-0.479629	2.530	0	10000	0	0	15670.50586	0	27.5	0	0	27.7	F814w	0.0060198717	0.008006438868	0.0003456024324	F160w	0.011773275	0.01416331175	0.001261405651
-SPT 2106-5844	j210604m5845	316.5	-58.733333	1.132	7680	1916	12512.04307	14376.72036	5623.505368	27.7	26.9	27.6	27.9	27.3	F606w	0.008968984	0.01246307609	0.0002696116525	F105w	0.020148674	0.01855980555	0.001843501902
-SPT 0205	j020548m5829	31.4437	-58.4855	1.320	9492	3728	24694.75492	25226.69323	11651.04421	27.8	0	27.9	28.3	27.7	F606w	0.008438031	0.01086983571	0.0002707492528	F140w	0.017499708	0.01168819508	0.001163945998
+## Meta-table for Catalog Creation containing properties of the 5 relevant HST archival cluster data
+#the editable version is also online:  shorturl.at/pIJ34
+# A: the astronomical name of the cluster
+#B: the corresponding database ID of each cluster found in the GOGREEN database by G. Brammer
+#C: RA in degrees
+#D: Dec in Degrees
+#E: Expected redshift
+##F-J are integration times for the specific clusters; the observation time varies across the *sci.fits image due to multiple pointings and drizzling.
+#F: HST observation time with the F606w filter (seconds)
+#G: HST observation time with the F814w or F814wu filter (seconds)
+#H: HST observation time with the F105w filter (seconds)
+#I: HST observation time with the F140w filter (seconds)
+#J: HST observation time with the F160w filter (seconds)
+##K-O are values of the 5-sigma depth of each band, in an aperture with a diameter= 0.5 arcsec. These are derived through empty aperture simulation and the use of the Working_Depth.ipynb. (AB magnitudes)
+#K: the 5-sigma AB magnitude depth in a 0.5 arcsecond diameter aperture for the F606w band image
+#L: the 5-sigma AB magnitude depth in a 0.5 arcsecond diameter aperture for the F814w band image
+#M: the 5-sigma AB magnitude depth in a 0.5 arcsecond diameter aperture for the F105w band image
+#N: the 5-sigma AB magnitude depth in a 0.5 arcsecond diameter aperture for the F140w band image
+#O: the 5-sigma AB magnitude depth in a 0.5 arcsecond diameter aperture for the F160w band image
+## the rest of the table is divided into properties for a 'blueward' and 'redward' band, referring to the image bands with the deepest integration time that fall on either side of the 4000 Angstrom break of the cluster, given the cluster's expected redshift. P and T identify which bands were used to derive the RMS properties and linear size-noise dispersion relation coefficients for the 'blueward' and 'redward' bands respectively. Therefore Q,R, and S are properties derived from the band identified in P, and U,V, and W are properties derived from the band identified in T 
+##R and S, and also V and W, are the 2nd and 3rd coefficients of a polynomial fit to the noise of the blueward and redward bands as a function of linear size: f(x) = c1+c2*x + c3*x^2. the value of c1 is set to zero for both bands. c2 and c3 can be related to a_i and b_i from Labbe+03's eqn 3 using the rms of the image and the weight associated with each source. They are derived, in Working_Depth.ipynb, from the results of an empty aperture simulation that places 1000 apertures of a given size across a noise-normalized, object-subtracted, masked version of the native image.
+#P: Identifier for the deepest band blueward of the 4000 Angstrom break	
+#Q: full RMS background measurement returned by depthcalc.rmscalc(). Current number looks at the native science image (clusterid-filterblue_drz_sci.fits), but might be more appropriate to do this to the noisenormalized science image (clusterid-filter_drz_sci_newnorm3.fits)
+#R: second coefficient  for a 2nd order polynomial fit to the standard deviation of the flux as a function of linear size (square root of the area of the associated aperture). blue band image 
+#S: third coefficient  for a 2nd order polynomial fit to the standard deviation of the flux as a function of linear size (square root of the area of the associated aperture). blue band image
+#T: Identifier for the deepest band redward of the 4000 Angstrom break													
+#U: full RMS background measurement returned by depthcalc.rmscalc(). Current number looks at the native science image (clusterid-filter_drz_sci.fits), but might be more appropriate to do this to the noisenormalized science image (clusterid-filterred_drz_sci_newnorm3.fits)
+#V: second coefficient  for a 2nd order polynomial fit to the standard deviation of the flux as a function of linear size (square root of the area of the associated aperture). red band image
+#W: third coefficient  for a 2nd order polynomial fit to the standard deviation of the flux as a function of linear size (square root of the area of the associated aperture). red band image
+##########################################################################################
+'IDCS1426.5+3508'	j142632p3508	216.625		35.133333	1.75	21760	12620	15242.6368	16292.0243	9053.538417	28.5	27.9	27.9	28.1	27.3	F606w	0.00256719	0.005538353534	0.0001737992981	F140w	0.020567134	0.01562541459	0.001310705061
+'SpARCS J1049'	j104924p5641	162.344167	56.675694	1.7089	0	2846	8525.721866	0	9213.998767	0	26.2	27.5	0	27.3	F105w	0.035111424	0.01793439735	0.003119223968	F160w	0.031919356	0.02005814456	0.001921471231
+'USS 1558-003'	j160116m0029	240.322303	-0.479629	2.530	0	10000	0	0	15670.50586	0	27.5	0	0	27.7	F814w	0.0060198717	0.008006438868	0.0003456024324	F160w	0.011773275	0.01416331175	0.001261405651
+'SPT 2106-5844'	j210604m5845	316.5	-58.733333	1.132	7680	1916	12512.04307	14376.72036	5623.505368	27.7	26.9	27.6	27.9	27.3	F606w	0.008968984	0.01246307609	0.0002696116525	F105w	0.020148674	0.01855980555	0.001843501902
+'SPT 0205'	j020548m5829	31.4437	-58.4855	1.320	9492	3728	24694.75492	25226.69323	11651.04421	27.8	0	27.9	28.3	27.7	F606w	0.008438031	0.01086983571	0.0002707492528	F140w	0.017499708	0.01168819508	0.001163945998

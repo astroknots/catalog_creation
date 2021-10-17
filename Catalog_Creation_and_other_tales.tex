@@ -1,0 +1,450 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+
+%opening
+\title{.}
+\author{K. M. Jones}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Introduction}
+\subsection*{Overview}
+There are 3 main steps to making a catalog with these programs. Each of these processes, including the input required and the output produced, is detailed in \textbf{Section 2}:
+\begin{itemize}
+ \item{\textbf{Pre-processing:}} 
+ Pre-process the native science images using:\\
+ 
+ \centerline{python \textbf{maskitextra.py} \textit{file\_sci.fits} \textit{file\_wht.fits}}
+ 
+ \item{\textbf{Reprojecting:}} Reproject your blue-band image to the pixel space of the red-band image using: \\
+ 
+ \centerline{python \textbf{reproj\_kmj.py} \textit{file\_blue\_sci.fits} \textit{file\_red\_sci.fits} \textit{outputfilename}}
+ 
+ \item{\textbf{Convolving:}} Convolve by running through the \textcolor{blue}{Convolutin\_py3\_v2.ipynb Cells 1-6} and then \textcolor{blue}{7-9} and selecting the best convolution image
+ \item{\textbf{Catalog Creation}} Create a dual-image mode catalog by running through the \textcolor{blue}{make\_a\_catalog.ipynb Cells 1-8} and turning on the write-to-file in \textcolor{blue}{Cell 8}.
+\end{itemize}
+
+In addition, if you want to update or add to the metatable, or make plots of the depths which are reached in each band, you will need to run through a distinct process:
+\begin{itemize}
+ \item{\textbf{Pre-Processing}} Use Source Extractor to produce object subtracted and segmentation images associated with the noise-normalized version of the science image and mask the output object subtracted image
+ \item{\textbf{Empty Aperture Simulation}} run the Empty Aperture Simulation, and pipe its output to a universal text file via: \\
+ 
+ \centerline{python \textbf{runEAA.py} \textit{file\_objsub\_newnorm3\_maskd.fits} \textit{shortfilename\_filter\_osnn3m} pixelscale} 
+ 
+ 
+ \item{\textbf{Plotting and Fitting}} Plot and fit values by running through the \textcolor{blue}{Working\_Depth.ipynb Cells 1-4}
+\end{itemize}
+
+\subsection*{Provided \textcolor{blue}{jupyter notebooks}, \textcolor{black}{\textbf{python programs/scripts}}, \textcolor{red}{data tables}, and \textcolor{orange}{parameter files}}
+\begin{itemize}
+ \setlength{\itemsep}{-5.5pt}
+ \item \textcolor{blue}{Working\_Depth.ipynb}
+ \item \textcolor{blue}{make\_a\_catalog.ipynb}
+ \item \textcolor{blue}{Convolutin\_py3\_v2.ipynb}
+ \item \textcolor{blue}{colormag\_plots.ipnb}
+ \item \textbf{depthcalc.py}
+ \item \textbf{iterate\_convolution.py}
+ \item \textbf{getweight.py}
+ \item \textbf{quickmask.py}
+ \item \textbf{maskitextra.py}
+ \item \textbf{runEAA.py}
+ \item \textbf{reproj\_kmj.py}
+ \item \textcolor{red}{metatable\_v1.txt}
+ \item \textcolor{orange}{default\_dualimage.sex}
+ \item \textcolor{orange}{default\_objsub\_norm.sex}
+ \item \textcolor{orange}{def\_phot.param}
+ \item \textit{gogreen\_photometry.fits}
+ \item \textit{Images: \_sci.fits and \_wht.fits for multiple bands}
+\end{itemize}
+
+
+\subsection*{Requirements to get started}
+
+\begin{itemize}
+ \item \textbf{Source Extractor (2.19.5+)}. Install this in the source\_extractor folder. You will also require the \textcolor{orange}{default\_objsub\_norm.sex} and \textcolor{orange}{default\_dualimage.sex}, as well as \textcolor{orange}{def\_phot.param}. For SE to run successfully, you'll need ATLAS v3.6+ and FFTw v3.0+
+ \item Registered \_sci.fits and \_wht.fits images
+ \item \textbf{sewpy}, a python-usable interface for calling on Source Extractor. this can be finicky to set up.
+ \item Most of the jupyter notebooks require \textbf{Python 3.6} and \textbf{astropy}
+ \end{itemize}
+
+
+\section{Making a Catalog from HST Archival Images}
+
+If you want to make a catalog where you compare the fluxes of the same sources in different bands, there are a couple of steps you need to do before you can effectively use Source Extractor in dual-image mode to make the catalog. The images need to be a) registered, b) reprojected and c) convolved. More specifically, you want to account for any way in which the images would be distorted or different from each other due to systematics from the instrument. 
+
+There are programs/notebooks for both b) and c) that are detailed below but it is important to note that no registration is done. The original data worked with (drizzled HST mosaics of GOGREEN clusters from G. Brammer database) were already registered. If you are working with a different data set you may need to add a registration stage before you do the below
+
+\subsection{Pre-Processing}
+
+You will eventually need a mask file that details where data exists in your image files and where it does not. To get this, run your native science and weight images through the \textbf{maskitextra.py} program. You will need to do this for every band you intend to use in the creation of the catalog--at minimum, we recommend doing this for a ``blue'' and ``red'' band, which fall on either side of the 4000 \AA  break for the cluster's redshift. For the 5 GoGreen clusters, the recommended ``blue'' and ``red'' bands are included in the metatable.
+
+\subsubsection*{Example}
+
+General form: \\
+python \textbf{maskitextra.py} \textit{file\_sci.fits file\_wht.fits} \\
+
+\noindent Parameters:
+\begin{itemize}
+    \setlength{\itemsep}{-5pt}
+    \item \textit{file\_sci.fits}: full name and path of the relevant native science file
+    \item \textit{file\_wht.fits}: full name and path of the weight file associated with \textit{file\_sci.fits}
+\end{itemize}
+
+
+\noindent Example:\\
+\textbf{python maskitextra.py} \ /home/k689j329/HSTdata/j020548m5829/j020548m5829-f606w\_drc\_sci.fits \ /home/k689j329/HSTdata/j020548m5829/j020548m5829-f606w\_drc\_wht.fits \\
+
+\noindent Example Output:
+\begin{itemize}
+    \setlength{\itemsep}{-5pt}
+ \item j020548m5829-f606w\_drc\_sci\_mask.fits
+ \item j020548m5829-f606w\_drc\_sci\_newnorm3.fits
+\end{itemize}
+
+
+
+\subsection{Reprojectin'}
+Reprojection is memory intensive so you will need to run this on a machine that can be tied up for approximately 30 minutes. Simply run your native blue and red band images through reproj\_kmj.py, and also give it the name you want the output file to take
+\subsubsection*{Example}
+General form:\\
+\textbf{python reproj\_kmj.py} \textit{file\_blue\_sci.fits file\_red\_sci.fits outputfilename.fits} \\
+
+\noindent Parameters:
+\begin{itemize}
+\setlength{\itemsep}{-5pt}
+ \item \textit{file\_blue\_sci.fits}: full name and path of the native science file for the band blueward of the 4000 \AA \ break. This is the file that will be changed, reprojected to the pixel space of the other file.
+ \item \textit{file\_red\_sci.fits}: full name and path of the native science file for the band redward of the 4000 \AA \ break. This file will not be changed/reprojected.
+ \item \textit{outputfilename.fits}: name you want your output file to take
+\end{itemize}
+
+\noindent Example: \\
+python \textbf{reproj\_kmj.py} \ /home/k689j329/HSTdata/j020548m5829/j020548m5829-f606w\_drc\_sci.fits \  /home/k689j329/HSTdata/j020548m5829/j020548m5829-f140w\_drz\_sci.fits \ j0205\_f606w\_reprj.fits \\
+
+\noindent Example Output: 
+\begin{itemize}
+\setlength{\itemsep}{-5pt}
+ \item j0205\_f606w\_reprj.fits
+ \item j0205\_f606w\_reprj\_wht.fits
+\end{itemize}
+
+
+Note to more experienced users: this program uses Astropy's \textbf{reproject\_exact} to preserve the total energy received per unit area on the sky as one reprojects from the blue image's pixel space to the red image's pixel space. The quicker \textbf{reproject\_interp} is \textbf{strongly NOT recommended for matched aperture photometry}.
+\subsection{Convolutin'}
+
+In contrast to the previous two steps, the process of convolution is more complex. Fortunately for you, you can use the \textcolor{blue}{Convolutin\_py3\_v2.ipynb} jupyter notebook to go through this process. You will need \textbf{sewpy} to function for this to run. 
+
+\begin{itemize}
+ \item First update the parameters in \textcolor{blue}{Cell 3}
+ \item Then run \textcolor{blue}{Cells 4, 5, and 6}
+ \item Inspect the graph produced. It is most likely that there is no point that matches exceptionally well with the horizontal line (and even if there is, the calculations might as well be refined to higher accuracy), so proceed to run \textcolor{blue}{Cells 7, 8, and 9}.
+ \item Use the results of \textcolor{blue}{Cell 9} to determine which of the convolved images produced is the most appropriate to use going forward. 
+\end{itemize}
+
+
+\noindent The point of this notebook is to figure out the convolution kernel that, when used on the reprojected blue image, best reproduces the PSF seen in the native red image. At an initial guess, an appropriate FWHM to define a Gaussian2Dkernel to use for convolution could be obtained by 
+
+\begin{equation}
+ FWHM_{compromise}=\sqrt{FWHM_{red}^{2.0}-FWHM_{blue}^{2.0}}
+\end{equation}
+
+where the FWHM are in arcseconds. Alas, this simple idea does not necessarily produce the best PSF match, so the notebook constructs several convolution kernels with a reasonable range of FWHM, convolves them with the reprojected blue image, and calculates the median stellar FWHM that results.
+
+\subsubsection{Adjusting Cell 3 Input Parameters}
+\begin{itemize}
+
+ \item \textit{fileblue}: full name and path of the \underline{native} science file for the band blueward of the 4000 \AA break.
+ \item \textit{filered}: full name and path of the native science file for the band redward of the 4000 \AA \ break.
+ \item \textit{filereprojd} full name and path of the \underline{reprojected} science file for the band blueward of the 4000 \AA \ break. This should be the same as the \textit{outputfilename.fits} provided to \textbf{reproj\_kmj.py} (unless of course you've renamed that file since then).
+ \item ident1 and ident2: two distinct strings that will be added to the names of the output files. Note that the part of the program that convolves the data will not overwrite existing files, so if you do not update these identifiers nothing will be convolved after the first time, no matter how many parameters you change. The default is 'sept\_' and 'septb\_', but you can use any string you desire.
+ \item fwhm\_blue\_pix: a measurement, in pixels, of the typical size of the PSF of a star in the native blue image \textit{fileblue}
+ \item fwhm\_red\_pix: a measurement, in pixels, of the typical size of the PSF of a star in the native red image \textit{filered} \footnote{Fwhm\_blue\_pix and fwhm\_red\_pix are used in \textcolor{blue}{Cell 4} to derive a range \textbf{yarray1} of possible FWHM for convolution kernels with which the \textit{filereprojd} is convolved. Note however that FWHM\_red\_pix is also used in more extensive calculations. Fwhm\_red\_pix is fed into iterate\_convolution.makecat() as the seeing, which is used by Source Extractor to distinguish between 'star-like' and 'galaxy-like' objects in the CLASS\_STAR value that is returned (where the closer an object's value is to 1, the more likely it is a star). This CLASS\_STAR key is in turn used to identify which objects are included in the calculation of the median FWHM \textit{measured} from the convolved image. Since the point is to minimize the difference between this measured median FWHM and the FWHM we want to match, it can have an impact on that calculation. However, I have done a few small iterations (~1/2 and ~2x the FWHM I'd measured for J2106) and the program seems robust to such variations. High precision, therefore, is not a requirement; and note that the 'acceptable range' of the CLASS\_STAR value can be adjusted via the \textbf{star\_limit} kwarg when iterate\_convolution.calcfwhm() is called in \textcolor{blue}{Cells 5 and 8}.}
+\end{itemize}
+
+\subsubsection{Outputs:}
+
+Once you have run through \textcolor{blue}{Cells 1-9}, you will have 15 new \textit{.fits} images with the following format (where i=0-14):
+
+\centerline{\textit{filereprojd+`\_conv\_'+str(ident1)+str(i)+`.fits'}}
+
+\noindent And 20 new \textit{.fits} images with the following format (where j=0-19):
+
+\centerline{\textit{filereprojd+`\_conv\_'+str(ident2)+str(j)+`.fits'}}
+
+\noindent The graphs and text\footnote{hmm, through a bit of a glitch it's possible to end up with two kernels that are equally close to the required FWHM\_red\_recalcd. Looks like this will break the part that simply tells you which file to use. You can make your own assessment based on the graphs (note that given the way the arrays are constructed, the kernels associated with each file are plotted starting at the right and going to the left; also note 0 based indexing for python). Alternatively, simply have the program in Cell 6 or Cell 9 do a print(np.where(p)[0]) (or (g)[0]) and pick one to set t or k to} produced by \textcolor{blue}{Cell 9} are then used to identify which of these images you will use going forward, to the catalog creation in \textbf{Section 2.4} 
+
+\subsubsection*{Example:}
+
+If you used filereprojd=j0205\_f606w\_reprj.fits, ident1=a, and ident2=b, you would end up with
+
+\centerline{j0205\_f606w\_reprj\_conv\_a0.fits}
+\centerline{j0205\_f606w\_reprj\_conv\_a1.fits}
+\centerline{...}
+\centerline{j0205\_f606w\_reprj\_conv\_a14.fits}
+and \\
+\centerline{j0205\_f606w\_reprj\_conv\_b0.fits}
+\centerline{...}
+\centerline{j0205\_f606w\_reprj\_conv\_b19.fits}
+
+
+
+\subsubsection*{Notes for more experienced users:}
+
+Note if you are using other than a drizzled image you may need a more complicated pixel scale conversion than simply taking CD1\_1 from the header; this can be adjusted in \textcolor{blue}{Cell 4}
+
+\noindent The actual process of the convolution is done via \textbf{iterate\_convolution.py's conv2Dgauss()} function. This takes in the following parameters:
+\begin{itemize}
+ \item The fits file to be convolved (which should be the reprojected blue band image)
+ \item The FWHM of the convolution kernel you wish to use (do not use the variance--the function corrects for that).
+ \item an integer that gets fed into the produced filename (should default to zero)
+\end{itemize}
+ 
+\noindent As suggested by its name, this uses a 2DGaussian kernel, symmetric. However if you require a different kernel it is possible to adjust the function for your needs.
+
+\noindent You can adjust the number of output files produced by changing the values used to define yarray1 and ya2 in \textcolor{blue}{Cells 4 and 7}, respectively. Currently set to 15 and 20.
+
+\noindent In \textcolor{blue}{Cells 5 and 8}, the \textbf{for} loop makes a catalog of sources from each convolved image produced (using 
+textbf{iterate\_convolution.py's makecat()} function) and then calculates a median FWHM of the most stellar-like objects using \textbf{iterate\_convolution.py's calcfwhm()} function. This function has a number of \textbf{**kwargs} that can be changed to select which objects are considered in the calculation:
+
+\centerline{\textbf{def calcfwhm(table1,star\_limit=0.8,maglow=-2.0, maghigh=-0.5,fwhmlim=4.5,plottin=False)}}
+
+where maglow, maghigh, and fwhmlim are used to constrain the 'stellar sequence' in a FWHM-magnitude plot, and star\_limit corresponds the associated CLASS\_STAR value output by Source Extractor. This can vary dramatically depending on the properties of the input image--for example, when making the j210604m5845 catalog, CLASS\_STAR peaked at about 0.85, making the more typical limit of stellar objects having CLASS\_STAR \textgreater 0.95 unreasonable. Just something to keep an eye on if you want to use it.
+
+
+
+
+\subsection{Dual-image Mode Source Extractor and Making a Catalog}
+
+Now, you've got two images with objects in the same pixel space/position, with stellar sources giving the same PSF implying that the light is distributed around the given source in the same way in both bands. You'll use these two images in 'dual-image mode' of Source Extractor. Dual-image mode identifies ``sources'' in one band (the most reliable band) and uses the locations of those sources in subsequent images/bands to measure photometric properties including flux and sizes. 
+
+\begin{itemize}
+\setlength{\itemsep}{-5pt}
+ \item (a) Update \textcolor{orange}{default\_dualimage.sex} if needed
+ \item (b) Update the values in \textcolor{blue}{Cells 3, 5, 7 and 8}
+ \item (c) (Probably) update variable names from \textcolor{blue}{Cell 5-8}
+ \item (d) Run \textcolor{blue}{Cells 1-7}, skipping \textcolor{blue}{Cell 6.5}
+ \item (e) Uncomment the t.writeto(outputcatalog) line in \textcolor{blue}{Cell 8} and run \textcolor{blue}{Cell 8} 
+\end{itemize}
+
+\subsubsection{(a)  Update \textcolor{orange}{default\_dualimage.sex} if needed}
+
+This parameter file tells Source Extractor how to identify objects (sources) when it runs. The main parameters that you might adjust fall into several categories:
+
+\begin{itemize}
+\setlength{\itemsep}{-5pt}
+ \item Detection parameters: DETECT\_MINAREA, DETECT\_THRESH, FILTER\_NAME 
+ \item Output control parameters: PHOT\_APERTURES, PHOT\_AUTOPARAMS, SEEING\_FWHM
+ \item Background subtraction parameters: My experiments indicated that a constant background subtraction was more reliable than an automatically calculated background, mostly due to large scale variation in the images. This requires BACK\_TYPE = MANUAL and BACK\_VALUE derived
+\end{itemize}
+
+\subsubsection{(b) Update the values in \textcolor{blue}{Cells 3, 5, 7 and 8}}
+
+\begin{itemize}
+ \item
+Like most of the \textcolor{blue}{.ipynb} provided, the main definition of files to be processed by the notebook happens in \textcolor{blue}{Cell 3}. Here you must update:
+
+\begin{itemize}
+\setlength{\itemsep}{-2pt}
+ \item filered: full name and path of the native science file for the band redward of the 4000 \AA \ break. This is the un-altered image. 
+ \item fileblue: full name and path of the reprojected and convolved science file for the band blueward of the 4000 \AA \ break. This file will be the one you selected after running through the convolution process; it should look something like: j0205\_f606w\_reprj\_conv\_b13.fits
+ \item fileoutrr and fileoutrb: these are the names of the catalogs produced by source extractor. They will be opened and processed in the rest of the notebook.
+ \item colnames and colnames2: These are lists of all of the values produced in the catalog files by running source extractor. They should correspond to the outputs set in the \textcolor{orange}{def\_phot.param} file, with one exception: only one of the identifying number columns needs to be retained, preferably that in colnames (set as 'SE\_ID\_f105w'). 
+ \item redwht and bluewht: These are the full name and path to weight images associated with filered and fileblue, respectively. 
+ \item outputcatalog: This will be the name of the produced catalog. The recommended format is 'catalog\_dualmode\_j020548m5829.fits'
+\end{itemize}
+
+    \item
+There are values that will need to be changed in other cells as well, however. In \textcolor{blue}{Cells 5 and 8}, the FLUX\_AUTO, FLUX\_ISO, and FLUX\_APER columns are identified for manipulation using e.g.:\\
+
+\noindent nms=='FLUX\_AUTO\_f105w'\\
+nms=='FLUX\_ISO\_f105w'\\
+nms=='FLUX\_APER\_f105w'\\
+
+and similarly for f606w. Since the values within colnames and colnames2 changed in \textcolor{blue}{Cell 3}, the values you are comparing nms to will also change. \textcolor{blue}{Cell 8} adds the names of the normalized weight columns, creating coltot--these must be updated as well.
+
+    \item
+    \textcolor{blue}{Cell 7} also needs to be updated as \textcolor{blue}{Cells 5 and 8} are, but in addition you must also update:
+    \begin{itemize}
+     \item fileredmask
+     \item fileredseg
+     \item filebluemask
+     \item fileblueseg
+    \end{itemize}
+    at least until \textcolor{blue}{Cell 6.5} works and the needed values can be extracted from the metatable.
+
+\end{itemize}
+
+
+
+\subsubsection{(c) (Probably) update variable names from \textcolor{blue}{Cell 5-8}}
+
+As you can see scrolling through it, the notebook has a lot of variables specifically named for the filter band to which they are referring. You will see things like:\\
+
+\centerline{countsauto\_f105w=data\_total[:,int(np.where(nms=='FLUX\_AUTO\_f105w')[0])]}
+
+\centerline{flambda\_auto\_f105w=countsauto\_f105w*photflam\_red}
+
+\centerline{wif105w=np.array(wi\_f105w)}
+
+\centerline{and}
+
+\centerline{fluxerr\_iso\_f606w=(C1\_f606w*N\_ISO\_f105w + C2\_f606w*N\_ISO\_f606w*N\_ISO\_f606w)/denomb}
+
+\hfill \break
+\noindent If you want to maintain careful accuracy, in addition to updating the parameters called on ('FLUX\_AUTO\_f105w' might become 'FLUX\_AUTO\_f160w' depending on your red and blue band images), you should correct all the variable names to reflect these changes as well:\\
+
+\centerline{countsauto\_\textbf{f160w}=data\_total[:,int(np.where(nms=='FLUX\_AUTO\_f160w')[0])]}
+
+\hfill \break
+\noindent Technically this should be unnecessary, but for matters of neatness and consistency it is a step that should probably be done.
+
+\subsubsection{(d) Run \textcolor{blue}{Cells 1-7}, skipping \textcolor{blue}{Cell 6.5}}
+
+The \textcolor{blue}{Cell 6.5} is designed to read in the data from the metatable, which will make \textcolor{blue}{Cell 7} neater. Unfortunately it's not yet functional.
+
+\subsubsection{(e) Uncomment the t.writeto(outputcatalog) line in \textcolor{blue}{Cell 8} and run \textcolor{blue}{Cell 8}}
+
+\subsubsection*{For experienced users:}
+Error Calculations
+
+\noindent Weights
+
+
+\section{Populating or Expanding the Meta-table}
+\subsection{Pre-Processing 2.0}
+
+In order to perform the empty aperture simulation, you'll need a noise-normalized, object-subtracted version of your image. In the first stage of pre-processing you used \textbf{maskitextra.py} to produce a \textit{file\_sci\_newnorm3.fits} and a \textit{file\_sci\_mask.fits}.
+\begin{itemize}
+ \item{(a)} Run Source Extractor on newnorm3.fits
+ \item{(b)} Run quickmask.py on the objsubnewnorm3.fits
+ \end{itemize}
+
+
+\subsubsection*{Example}
+
+General form: \\
+(a) sextractor \textit{file\_sci\_newnorm3.fits} -c \textcolor{orange}{default\_objsub\_norm.sex} -CHECKIMAGE\_NAME \textit{file\_sci\_objsub\_newnorm3.fits},\textit{file\_sci\_seg\_newnorm3.fits}  \\
+
+\noindent (b) python \textbf{quickmask.py} \textit{file\_sci\_objsub\_newnorm3.fits} \textit{file\_sci\_mask.fits} \\
+
+
+\noindent Parameters:
+\begin{itemize}
+    \setlength{\itemsep}{-5pt}
+    \item \textit{file\_sci\_newnorm3.fits}: full name and path of the relevant noise-normalized science image
+    \item \textcolor{orange}{default\_objsub\_norm.sex}: a special parameter file that Source Extractor uses to identify objects (sources) that will be subtracted\footnote{There are a lot of adjustable parameters in here. \textcolor{orange}{default\_objsub\_norm.sex} contains some of the best settings I derived through experimentation, but per cluster you might need to adjust FILTER\_NAME for a filter with a gaussian fwhm closer to the FWHM of a typical star: and maybe (rarely?) DETECT\_THRESHOLD, DETECT\_MINAREA, PHOT\_APERTURES, and SEEING\_FWHM}
+    \item \textit{file\_sci\_objsub\_newnorm3.fits}: the name of the output object-subtract, noise-normalized image
+    \item \textit{file\_sci\_seg\_newnorm3.fits}: the name of the output segmentation file associated with the relevant noise-normalized science image.
+\end{itemize}
+
+
+\noindent Example:\\
+(a) sextractor \textit{j020548m5829-f606w\_drc\_sci\_newnorm3.fits} -c \textcolor{orange}{default\_objsub\_norm.sex} -CHECKIMAGE\_NAME \textit{j020548m5829\_f606w\_objsub\_newnorm3.fits},\textit{j020548m5829\_f606w\_seg\_newnorm3.fits}  \\
+
+\noindent (b) python \textbf{quickmask.py} \textit{j020548m5829\_f606w\_objsub\_newnorm3.fits} \textit{j020548m5829-f606w\_drc\_sci\_mask.fits}
+
+
+\noindent Example Output:
+\begin{itemize}
+    \setlength{\itemsep}{-5pt}
+ \item j020548m5829\_f606w\_objsub\_newnorm3.fits
+ \item j020548m5829\_f606w\_seg\_newnorm3.fits
+ \item j020548m5829\_f606w\_objsub\_newnorm3\_maskd.fits
+\end{itemize}
+
+\subsection{Empty Aperture Simulation}
+This process, while computationally heavy, is quite easy to run. The execution of python \textbf{runEAA.py} takes 10 min-1 hour, as it places 1000 empty apertures 30 times and measures their contents.
+\begin{itemize}
+    \setlength{\itemsep}{-2pt}
+ \item Run the empty aperture simulation:\\
+ 
+ \centerline{python \textbf{runEAA.py} \textit{file\_objsub\_newnorm3\_maskd.fits} \textit{filename\_osnn3m} pixelscale} 
+ 
+ \item Make a comprehensive .txt file:\\
+ 
+ \centerline{ls \$PWD/shortfilename\_filter\_osnn3m\*.dat \textbf{\textgreater} \ all\_shortfilename\_aps.txt}
+\end{itemize}
+
+\noindent \textbf{Parameters:}
+\begin{itemize}
+ \item \textit{file\_objsub\_newnorm3\_maskd.fits}: The noise-normalized, object-subtracted, masked image upon which empty aperture simulations will be performed.
+ \item \textit{filename\_osnn3m}: A unique name prefix for the output .dat and .reg files
+ \item pixelscale: The pixel scale in arcsec/pixel for the input image. This is used to determine the aperture sizes in pixels for purposes of calculation
+\end{itemize}
+
+
+\noindent \textbf{Example:}
+
+\centerline{python \textbf{runEAA.py} j020548m5829\_f606w\_objsub\_newnorm3\_maskd.fits j0205\_f606w\_osnn3m.dat 0.05}
+
+\centerline{...wait quite some time...}
+
+\centerline{ls \$PWD/j0205\_f606w\_osnn3m.dat \textgreater all\_j0205\_f606w\_osnn3m\_aps.txt}
+
+\subsection{Plotting and Fitting}
+
+The jupyter notebook \textcolor{blue}{Working\_Depth.ipynb} is used to analyze the noise characteristics of the available HST images used in the catalog. The values are input into the metatable manually, but calculated herein.
+
+
+\subsubsection{5$\sigma$ AB Mag Depth Values and Plots}
+\begin{itemize}
+    \setlength{\itemsep}{-5pt}
+ \item (a) Update the input files in \textcolor{blue}{Cell 2}
+ \item (b) Comment, and uncomment, the relevant filenames, origs, hdus, hdrs, holdphots, apers, \textbf{for} loops, and plt.plot() parameters in \textcolor{blue}{Cell 2} \footnote{each \textbf{for} loop has two options for the infile, depending on whether or not you remembered to include \$PWD/ when you piped your .dat to the all\_filename\_aps.txt file}
+ \item (c) Run Cells 1-2
+\end{itemize}
+
+\subsubsection{RMS ($\bar{\sigma}$) Values}
+
+RMS values are reported in the metatable for a ``blue'' and ``red'' band, which fall on either side of the 4000 \AA  break for the cluster's redshift. For the 5 GoGreen clusters, the recommended ``blue'' and ``red'' bands are included in the metatable--they are the deepest and nearest bands that bracket the redshifted 4000 \AA. You will need to identify these bands to proceed with the \textcolor{blue}{Working\_Depth.ipynb}.
+
+\begin{itemize}
+ \item Execute (a)-(c) as above
+ \item (d) In \textcolor{blue}{Cell 3}, update the assignment of apers and sigs to aper\_r, aper\_b, sigs\_r, and sigs\_b to your identified blue and red bands
+ \item (e) Similarly, in \textcolor{blue}{Cell 3} update fits\_sci, fits\_mask, fits\_seg; fits\_scib, fits\_maskb, fits\_segb; and \textbf{don't forget the pixel scale values each time you call depthcalc.rmscalc()}
+ \item (f) Run \textcolor{blue}{Cell 3}. $\bar{\sigma}$ will be printed for each band in the output field below.
+\end{itemize}
+
+\subsubsection{Fitting a Polynomial to the Noise Dependence on Linear Size}
+
+Again, getting a fit to the dependence of the noise on linear size is quite straightforward:
+\begin{itemize}
+ \item Execute (a)-(f)
+ \item Run \textcolor{blue}{Cell 4}
+\end{itemize}
+
+We expect noise in these images to be correlated somewhat across the image due to ..... (the way CCDs work, mostly). In particular, we expect the noise as a function of linear size to take the following shape:
+
+\begin{equation}
+ \sigma(N) = c_{0} + c_{1}N + c_{2}N^{2}
+\end{equation}
+
+where $N=\sqrt{A}$ is the linear size of apertures with area A. $C_{0}$ is set to zero for realism.
+
+ The correlation of noise across linear scales within an image is discussed in more detail in, for example, Labbe, Franx, Rudnick, et al (2003, AJ 125 3). The parameters derived in \textcolor{blue}{Working\_Depth.ipynb} can be related to the $a_{i}$ and $b_{i}$ parameters in that text with the RMS value ($\bar{\sigma}$)as follows:
+
+
+\centerline{$a_{i} = c_{1}/\bar{\sigma}$  \ \ \ \  and \ \ \ \ $b_{i} = c_{2}/\bar{\sigma}$}
+
+
+
+
+
+
+
+
+\section*{A Short Note for Beginners}
+
+Registration is the process by which the coordinate systems are aligned between two images of the same field. 
+
+Reprojection is a linear transformation of every image such that a given position on the sky will map to the same pixel in each one of your transformed images. Rotation, shift, and scale are applied to each image to map it onto another image with a different set of those values.  
+
+As Montage (http://montage.ipac.caltech.edu/docs/algorithms.html) says of reprojection, ``The goal is to create an output image which is as close as possible to that which would have been created if the sky had been observed using an instrument with the output image's pixel pattern''. This is used when you are making comparisons between multiple wavelength bands (which usually have CCDs with different pixel arrangements). 
+
+Finally, convolution is used to make sure that a point source (i.e. a particular star) is translated into the same resultant PSF in the reprojected blue image as it is in the native red image. 
+
+
+\end{document}

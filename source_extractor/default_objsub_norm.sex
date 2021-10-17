@@ -4,7 +4,7 @@
  
 #-------------------------------- Catalog ------------------------------------
  
-CATALOG_NAME     j2106_f105w_b2rrc_may21_test13_objsub.cat       # name of the output catalog
+CATALOG_NAME     temp.cat       # name of the output catalog
 
 CATALOG_TYPE     ASCII_HEAD     # NONE,ASCII,ASCII_HEAD, ASCII_SKYCAT,
                                 # ASCII_VOTABLE, FITS_1.0 or FITS_LDAC
@@ -69,11 +69,11 @@ BACKPHOTO_TYPE   GLOBAL         # can be GLOBAL or LOCAL
 
 #------------------------------ Check Image ----------------------------------
  
-CHECKIMAGE_TYPE  -OBJECTS           # can be NONE, BACKGROUND, BACKGROUND_RMS,
+CHECKIMAGE_TYPE  -OBJECTS,SEGMENTATION           # can be NONE, BACKGROUND, BACKGROUND_RMS,
                                 # MINIBACKGROUND, MINIBACK_RMS, -BACKGROUND,
                                 # FILTERED, OBJECTS, -OBJECTS, SEGMENTATION,
                                 # or APERTURES
-CHECKIMAGE_NAME  j2106_f105w_b2rrc_may21_test13_objsub.fits     # Filename for the check-image
+CHECKIMAGE_NAME  j020548m5829_f105w_objsub_newnorm3.fits,j020548m5829_f105w_seg_newnorm3.fits     # Filename for the check-image
 
  
 #--------------------- Memory (change with caution!) -------------------------

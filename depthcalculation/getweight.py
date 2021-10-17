@@ -5,8 +5,6 @@ import astropy.table
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import os,random,time
-import matplotlib.backends.backend_pdf
-from matplotlib.backends.backend_pdf import PdfPages
 from astropy.io import fits
 import scipy.stats as ss
 from astropy.modeling import models, fitting
